@@ -19,6 +19,12 @@ export const configSchema = z.object({
   temperature: z.number().min(0).max(1).default(0.7).describe("Temperature setting"),
 });
 
+/**
+ * Create and register a set of MCP tools for Tessie vehicle data and return the configured MCP server.
+ *
+ * @param config - Configuration object (validated against `configSchema`) containing Tessie API key and model settings (e.g., `apiKey`, `modelName`, `temperature`).
+ * @returns The configured MCP server instance (`server.server`) ready for use by the Smithery CLI transport.
+ */
 export default function createServer({
   config
 }: {
