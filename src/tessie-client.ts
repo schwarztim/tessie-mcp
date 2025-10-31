@@ -6,6 +6,8 @@ export interface TessieVehicleState {
   vin: string;
   state?: string;
   timestamp?: number;
+  
+  // Nested structure (Tesla API format)
   vehicle_state?: {
     vehicle_name?: string;
     locked?: boolean;
@@ -30,6 +32,21 @@ export interface TessieVehicleState {
     speed?: number;
     power?: number;
   };
+  
+  // Flat properties (Tessie API actual response format)
+  // These are added to match the actual API behavior
+  battery_level?: number;
+  battery_range?: number;
+  charging_state?: string;
+  time_to_full_charge?: number;
+  latitude?: number;
+  longitude?: number;
+  locked?: boolean;
+  sentry_mode?: boolean;
+  odometer?: number;
+  inside_temp?: number;
+  outside_temp?: number;
+  is_climate_on?: boolean;
 }
 
 export interface TessieDrive {
@@ -82,6 +99,18 @@ export interface TessieLocation {
   longitude: number;
   address: string;
   saved_location?: string;
+}
+
+export interface TessieTirePressure {
+  front_left: number;
+  front_right: number;
+  rear_left: number;
+  rear_right: number;
+  front_left_status: 'unknown' | 'low' | 'normal';
+  front_right_status: 'unknown' | 'low' | 'normal';
+  rear_left_status: 'unknown' | 'low' | 'normal';
+  rear_right_status: 'unknown' | 'low' | 'normal';
+  timestamp: number;
 }
 
 export class TessieClient {
@@ -209,6 +238,28 @@ export class TessieClient {
       }));
     }, {
       maxRetries: 2, // Account list is fairly stable
+      baseDelay: 1500
+    });
+  }
+
+  async getTirePressure(
+    vin: string,
+    pressureFormat: 'bar' | 'kpa' | 'psi' = 'psi',
+    from?: number,
+    to?: number
+  ): Promise<TessieTirePressure> {
+    return ErrorHandler.withRetry(async () => {
+      const params = new URLSearchParams();
+      params.append('pressure_format', pressureFormat);
+      if (from) params.append('from', from.toString());
+      if (to) params.append('to', to.toString());
+
+      const response: AxiosResponse<TessieTirePressure> = await this.client.get(
+        `/${vin}/tire_pressure?${params.toString()}`
+      );
+      return response.data;
+    }, {
+      maxRetries: 2,
       baseDelay: 1500
     });
   }
