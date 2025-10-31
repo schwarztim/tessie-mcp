@@ -1,0 +1,83 @@
+name: Codex Auto Review
+
+on:
+  pull_request_target:
+    types:
+      - synchronize
+
+jobs:
+  trigger-codex-review:
+    if: github.event.pull_request.head.repo.fork == false && !contains(github.event.pull_request.labels.*.name, 'skip-codex')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Trigger Codex review for new commits
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          codex_delay="${CODEX_TRIGGER_DELAY:-20}"
+          min_delay=5
+          if ! [[ "${codex_delay}" =~ ^[0-9]+$ ]] || [ "${codex_delay}" -lt "${min_delay}" ]; then
+            echo "Invalid CODEX_TRIGGER_DELAY='${codex_delay}', defaulting to ${min_delay}s." >&2
+            codex_delay="${min_delay}"
+          fi
+
+          comment_body="@codex review"
+
+          create_comment() {
+            gh api \
+              --method POST \
+              "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+              -f body="${comment_body}" \
+              --jq '.id'
+          }
+
+          delete_comment() {
+            gh api \
+              --method DELETE \
+              "repos/${REPO}/issues/comments/${1}"
+          }
+
+          comment_id=""
+          created=false
+          for attempt in {1..3}; do
+            if comment_id="$(create_comment)"; then
+              if [[ -n "${comment_id}" && "${comment_id}" != "null" ]]; then
+                if ! [[ "${comment_id}" =~ ^[0-9]+$ ]]; then
+                  echo "Received non-numeric comment id '${comment_id}' from GitHub; aborting cleanup." >&2
+                  exit 0
+                fi
+                created=true
+                break
+              fi
+            fi
+            echo "Codex trigger comment attempt ${attempt} failed; retrying." >&2
+            sleep $((attempt * 5))
+          done
+
+          if [[ "${created}" != "true" ]]; then
+            echo "Codex trigger comment could not be created after retries; skipping cleanup." >&2
+            exit 0
+          fi
+
+          # Allow Codex extra time to process the trigger comment before removal.
+          sleep "${codex_delay}"
+
+          for attempt in {1..3}; do
+            if delete_comment "${comment_id}"; then
+              exit 0
+            fi
+            echo "Codex trigger comment deletion attempt ${attempt} failed; retrying." >&2
+            sleep $((attempt * 5))
+          done
+
+          echo "Codex trigger comment ${comment_id} could not be deleted; leaving it in place." >&2
+          exit 0
