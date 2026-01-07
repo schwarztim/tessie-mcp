@@ -20,6 +20,7 @@ export const configSchema = z.object({
   TESSIE_API_KEY: z
     .string()
     .min(1)
+    .optional()
     .describe("Tessie API access token from https://dash.tessie.com/settings/api"),
 });
 
@@ -234,14 +235,19 @@ export default function createServer({
   config: z.infer<typeof configSchema>;
   client?: TessieClient;
 }) {
-  const apiKey = config.TESSIE_API_KEY.trim();
+  const apiKey = config?.TESSIE_API_KEY?.trim();
   const server = new McpServer({
     name: "tessie-mcp-server",
     title: "Tessie Vehicle Data (v2)",
     version: "2.0.0",
   });
 
-  const client = clientOverride ?? new TessieClient(apiKey);
+  const client = clientOverride ?? (apiKey ? new TessieClient(apiKey) : null);
+
+  const requireClient = () => {
+    if (client) return client;
+    throw new Error("TESSIE_API_KEY is required to call Tessie APIs.");
+  };
 
   server.tool(
     "get_active_context",
@@ -251,7 +257,8 @@ export default function createServer({
     },
     async ({ only_active }) => {
       try {
-        const vehicles = await client.listVehicles({ onlyActive: only_active });
+        const activeClient = requireClient();
+        const vehicles = await activeClient.listVehicles({ onlyActive: only_active });
         const items = vehicles.map((v) => toVehicleListItem(v));
 
         return wrapContent({
@@ -276,7 +283,8 @@ export default function createServer({
     },
     async ({ vin }) => {
       try {
-        const state: TessieVehicleState = await client.getVehicleState(vin);
+        const activeClient = requireClient();
+        const state: TessieVehicleState = await activeClient.getVehicleState(vin);
         const summary = toStateSummary(vin, state);
 
         return wrapContent({
@@ -297,7 +305,8 @@ export default function createServer({
     },
     async ({ vin }) => {
       try {
-        const battery: TessieBatteryState = await client.getVehicleBattery(vin);
+        const activeClient = requireClient();
+        const battery: TessieBatteryState = await activeClient.getVehicleBattery(vin);
         return wrapContent({
           summary: toBatterySummary(vin, battery),
           battery,
@@ -319,7 +328,8 @@ export default function createServer({
     },
     async ({ vin, start, end, limit = 20 }) => {
       try {
-        const drives: TessieDrive[] = await client.getDrives(vin, { start, end, limit });
+        const activeClient = requireClient();
+        const drives: TessieDrive[] = await activeClient.getDrives(vin, { start, end, limit });
         const summaries = drives.map((drive) => toDriveSummary(drive));
 
         return wrapContent({
@@ -343,7 +353,8 @@ export default function createServer({
     },
     async ({ vin, start, end }) => {
       try {
-        const path: any[] = await client.getDrivingPath(vin, { start, end });
+        const activeClient = requireClient();
+        const path: any[] = await activeClient.getDrivingPath(vin, { start, end });
         return wrapContent({
           vin,
           points: summarizeList(path, PATH_POINT_LIMIT),
@@ -389,6 +400,7 @@ export default function createServer({
     },
     async ({ vin, operation, params }) => {
       try {
+        const activeClient = requireClient();
         const config = commandMap[operation];
         if (!config) {
           throw new Error(`Unsupported operation: ${operation}`);
@@ -437,7 +449,7 @@ export default function createServer({
           ? config.buildPayload(params)
           : { wait_for_completion: params?.wait_for_completion ?? true };
 
-        const result = await client.sendCommand(vin, config.endpoint, payload);
+        const result = await activeClient.sendCommand(vin, config.endpoint, payload);
         return wrapContent({
           vin,
           operation,
