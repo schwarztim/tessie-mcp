@@ -24,6 +24,7 @@ export const configSchema = z.object({
 });
 
 export function getTool(server: McpServer, name: string) {
+  // MCP SDK keeps tools private; this is a test helper.
   return (server as any)._registeredTools?.[name];
 }
 
@@ -220,6 +221,12 @@ function ensureRange(
   }
 }
 
+function ensureBoolean(value: boolean | undefined, name: string) {
+  if (value === undefined || typeof value !== "boolean") {
+    throw new Error(`Missing or invalid ${name}`);
+  }
+}
+
 export default function createServer({
   config,
   client: clientOverride,
@@ -350,7 +357,7 @@ export default function createServer({
 
   server.tool(
     "manage_vehicle_command",
-    "Composite command executor for Tessie vehicle actions (lock, charging, climate, speed limit, sentry).",
+    "Composite command executor for Tessie vehicle actions (lock, charging, climate, speed limit, sentry). Speed limit PIN is sensitive—avoid logging or sharing it.",
     {
       vin: z.string().regex(VIN_REGEX, "VIN must be 17 alphanumeric characters (no I/O/Q).").describe("Vehicle VIN."),
       operation: z.enum(operations),
@@ -368,7 +375,7 @@ export default function createServer({
             .optional()
             .describe("Heating/cooling level (0-3)."),
           speed_limit_mph: z.number().optional(),
-          speed_limit_pin: z.string().optional(),
+          speed_limit_pin: z.string().optional().describe("Speed limit PIN (sensitive; avoid logging)."),
           fan_only: z.boolean().optional(),
           cabin_overheat_on: z.boolean().optional(),
           cabin_overheat_temp_c: z.number().optional(),
@@ -421,6 +428,9 @@ export default function createServer({
         }
         if (operation === "set_cabin_overheat_protection_temp") {
           ensureRange(params?.cabin_overheat_temp_c, "cabin_overheat_temp_c", 15, 60);
+        }
+        if (operation === "set_cabin_overheat_protection") {
+          ensureBoolean(params?.cabin_overheat_on, "cabin_overheat_on");
         }
 
         const payload = config.buildPayload
