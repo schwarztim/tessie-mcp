@@ -3,7 +3,7 @@
   "servers": [
     {
       "name": "tessie-mcp-server",
-      "url": "../mcp.json"
+      "url": "/.well-known/mcp.json"
     }
   ]
 }
