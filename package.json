@@ -8,7 +8,8 @@
     "tessie-mcp-server": "./.smithery/stdio/index.cjs"
   },
   "files": [
-    ".smithery"
+    ".smithery",
+    ".well-known"
   ],
   "scripts": {
     "build": "npm run build:shttp",
