@@ -34,10 +34,10 @@ Non-destructive actions like `flash_lights` / `honk` skip confirmation.
 
 ## Smithery
 - Playground/dev tunnel: `npm run dev` or `npx @smithery/cli dev`
-- Transports: stdio (`npm run build:stdio`), shttp (`npm run build:shttp`)
+- Transports: stdio (`npm run build:stdio`), shttp (`npm run build:shttp`, default for publish)
 - Docs index: <https://smithery.ai/docs/llms.txt> ; TS quickstart: `npx create-smithery@latest`
-- Config schema: `.well-known/mcp-config` (expects `TESSIE_API_KEY`). Server card: `.well-known/mcp.json`.
-- Publish/update: `npm run build:all` → `npx @smithery/cli publish` (uses `manifest.json`). Ensure `TESSIE_API_KEY` is provided in user config.
+- Config schema: `.well-known/mcp-config` (expects `TESSIE_API_KEY`). Server card: `.well-known/mcp.json` (aliases in `.well-known/mcp-server.json` and `.well-known/mcp/server.json`).
+- Publish/update: `npm run build:shttp` → `npx @smithery/cli publish` (uses `manifest.json`). Ensure `TESSIE_API_KEY` is provided in user config.
 
 ## Notes
 - API references cached in `docs/llms-full.txt` and `docs/tessie-api-metadata.json` for offline context.

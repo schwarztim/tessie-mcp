@@ -10,11 +10,11 @@
   "keywords": ["tesla", "tessie", "vehicle", "car", "mileage", "location", "driving", "natural-language", "optimization", "analytics"],
   "server": {
     "type": "node",
-    "entry_point": "standalone-tessie-optimized.js",
+    "entry_point": ".smithery/shttp/index.cjs",
     "mcp_config": {
       "command": "node",
       "args": [
-        "${__dirname}/standalone-tessie-optimized.js"
+        "${__dirname}/.smithery/shttp/index.cjs"
       ],
       "env": {
         "TESSIE_API_KEY": "${user_config.TESSIE_API_KEY}"
