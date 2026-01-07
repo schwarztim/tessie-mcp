@@ -6,13 +6,13 @@
   "x-query-style": "dot+bracket",
   "type": "object",
   "properties": {
-    "tessie_api_token": {
+    "TESSIE_API_KEY": {
       "type": "string",
-      "title": "Tessie API Token",
-      "description": "Tessie API token for accessing vehicle data. Get your token from https://my.tessie.com/settings/api",
+      "title": "Tessie API Key",
+      "description": "Tessie API access token from https://dash.tessie.com/settings/api",
       "minLength": 1
     }
   },
-  "required": ["tessie_api_token"],
+  "required": ["TESSIE_API_KEY"],
   "additionalProperties": false
 }

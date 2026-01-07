@@ -17,7 +17,7 @@
         "${__dirname}/standalone-tessie-optimized.js"
       ],
       "env": {
-        "tessie_api_token": "${user_config.tessie_api_token}"
+        "TESSIE_API_KEY": "${user_config.TESSIE_API_KEY}"
       }
     }
   },
@@ -30,10 +30,10 @@
     }
   },
   "user_config": {
-    "tessie_api_token": {
+    "TESSIE_API_KEY": {
       "type": "string",
-      "title": "Tessie API Token",
-      "description": "Your Tessie API access token from https://my.tessie.com/settings/api",
+      "title": "Tessie API Key",
+      "description": "Your Tessie API access token from https://dash.tessie.com/settings/api",
       "sensitive": true,
       "required": true
     }
