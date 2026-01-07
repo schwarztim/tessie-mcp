@@ -18,7 +18,8 @@
       ],
       "env": {
         "TESSIE_API_KEY": "${user_config.TESSIE_API_KEY}"
-      }
+      },
+      "server_card": "${__dirname}/.well-known/mcp.json"
     }
   },
   "tools_generated": true,
