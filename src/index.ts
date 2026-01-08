@@ -20,7 +20,6 @@ export const configSchema = z.object({
   TESSIE_API_KEY: z
     .string()
     .min(1)
-    .optional()
     .describe("Tessie API access token from https://dash.tessie.com/settings/api"),
 });
 
