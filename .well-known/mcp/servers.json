@@ -3,7 +3,7 @@
   "servers": [
     {
       "name": "tessie-mcp-server",
-      "url": "/.well-known/mcp.json"
+      "url": "https://raw.githubusercontent.com/keithah/tessie-mcp/main/.well-known/mcp.json"
     }
   ]
 }

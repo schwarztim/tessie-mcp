@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "homepage": "https://github.com/keithah/tessie-mcp",
   "license": "MIT",
-  "config_schema": "/.well-known/mcp-config",
+  "config_schema": "https://raw.githubusercontent.com/keithah/tessie-mcp/main/.well-known/mcp-config",
   "transports": ["stdio", "shttp"],
   "icons": [
     {
