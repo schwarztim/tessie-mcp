@@ -17,7 +17,7 @@ import {
 } from "./types.ts";
 
 export const configSchema = z.object({
-  TESSIE_API_KEY: z
+  accessToken: z
     .string()
     .min(1)
     .describe("Tessie API access token from https://dash.tessie.com/settings/api"),
@@ -234,7 +234,7 @@ export default function createServer({
   config: z.infer<typeof configSchema>;
   client?: TessieClient;
 }) {
-  const apiKey = config?.TESSIE_API_KEY?.trim();
+  const apiKey = config?.accessToken?.trim();
   const server = new McpServer({
     name: "tessie-mcp-server",
     title: "Tessie Vehicle Data (v2)",

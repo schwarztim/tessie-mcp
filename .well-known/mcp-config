@@ -6,13 +6,13 @@
   "x-query-style": "dot+bracket",
   "type": "object",
   "properties": {
-    "TESSIE_API_KEY": {
+    "accessToken": {
       "type": "string",
       "title": "Tessie API Key",
       "description": "Tessie API access token from https://dash.tessie.com/settings/api",
       "minLength": 1
     }
   },
-  "required": ["TESSIE_API_KEY"],
+  "required": ["accessToken"],
   "additionalProperties": false
 }

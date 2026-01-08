@@ -4,7 +4,7 @@ MCP server rebuilt on the latest developer.tessie.com API. Summary-first tools, 
 
 ## Quickstart
 - Install (Smithery recommended): `npx -y @smithery/cli install @keithah/tessie-mcp`
-- Set `TESSIE_API_KEY` (<https://dash.tessie.com/settings/api>) in your MCP client or `.env`.
+- Set `TESSIE_API_KEY` (<https://dash.tessie.com/settings/api>) in your MCP client or `.env`. In Smithery UI the field appears as `accessToken`.
 - Try in a client: “List my vehicles” → `get_active_context`, “Lock VIN ...” → `manage_vehicle_command` with `confirm: true`.
 
 ## Tools

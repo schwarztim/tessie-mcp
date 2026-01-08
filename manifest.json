@@ -17,7 +17,7 @@
         "${__dirname}/.smithery/shttp/index.cjs"
       ],
       "env": {
-        "TESSIE_API_KEY": "${user_config.TESSIE_API_KEY}"
+        "TESSIE_API_KEY": "${user_config.accessToken}"
       },
       "server_card": "https://raw.githubusercontent.com/keithah/tessie-mcp/main/.well-known/mcp.json"
     }
@@ -31,7 +31,7 @@
     }
   },
   "user_config": {
-    "TESSIE_API_KEY": {
+    "accessToken": {
       "type": "string",
       "title": "Tessie API Key",
       "description": "Your Tessie API access token from https://dash.tessie.com/settings/api",
