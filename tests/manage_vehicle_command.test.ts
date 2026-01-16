@@ -2,7 +2,7 @@ import { z } from "zod";
 import createServer, { getTool } from "../src/index.ts";
 
 describe("manage_vehicle_command validation", () => {
-  const server = createServer({ config: { TESSIE_API_KEY: "test-key" } });
+  const server = createServer({ config: { accessToken: "test-key" } });
   const tool = getTool(server as any, "manage_vehicle_command");
 
   const vin = "5YJ3E1EA7KF317000";

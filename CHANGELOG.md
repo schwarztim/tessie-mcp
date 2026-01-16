@@ -2,6 +2,36 @@
 
 All notable changes to the Tessie MCP Extension will be documented in this file.
 
+## [v2.0.1] - 2026-01-16
+
+### Fixed
+- **Test Configuration**: Fixed test files to use correct `accessToken` property instead of deprecated `TESSIE_API_KEY`
+- **Security Vulnerabilities**: Resolved all 5 npm audit vulnerabilities (2 moderate, 3 high severity)
+  - Updated @modelcontextprotocol/sdk to fix DNS rebinding and ReDoS vulnerabilities
+  - Updated body-parser, glob, js-yaml, and qs to patched versions
+- **Jest Configuration**: Modernized ts-jest configuration to use current recommended format
+  - Moved ts-jest config from deprecated `globals` to `transform` array format
+  - Eliminated ts-jest deprecation warnings
+
+### Performance
+- **HTTP Connection Pooling**: Added HTTP/HTTPS agent with keep-alive for connection reuse
+  - Reduces TCP handshake overhead on subsequent requests
+  - Configured with 50 max sockets and 10 free sockets for optimal performance
+  - 30-second keep-alive timeout to maintain persistent connections
+  - Significant latency reduction for API calls (especially for multiple vehicles)
+
+### Technical Details
+- Tests now properly pass `{ accessToken: "..." }` to match configSchema definition
+- All dependency vulnerabilities patched via `npm audit fix`
+- HTTP agents configured with optimal socket pooling parameters
+- No breaking changes to external API or tool definitions
+
+### Impact
+- Improved security posture with all known vulnerabilities resolved
+- Better performance for users with multiple Tesla vehicles
+- Cleaner test output without deprecation warnings
+- More efficient network resource utilization
+
 ## [v1.2.2] - 2025-10-22
 
 ### Fixed

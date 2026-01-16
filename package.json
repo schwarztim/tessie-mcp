@@ -1,6 +1,6 @@
 {
   "name": "tessie-mcp-server",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tessie MCP server (v2) with summary-first tools built from the latest Tessie developer API.",
   "type": "module",
   "module": "./src/index.ts",
@@ -55,17 +55,14 @@
     "roots": ["<rootDir>/src", "<rootDir>/tests"],
     "testMatch": ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
     "transform": {
-      "^.+\\.ts$": "ts-jest"
+      "^.+\\.ts$": ["ts-jest", {
+        "useESM": true
+      }]
     },
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "extensionsToTreatAsEsm": [".ts"],
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    },
     "collectCoverage": true,
     "coverageDirectory": "coverage",
     "coverageReporters": ["text", "lcov", "html"]

@@ -1,4 +1,6 @@
 import axios, { AxiosInstance } from "axios";
+import { Agent as HttpAgent } from "http";
+import { Agent as HttpsAgent } from "https";
 import { toMcpError } from "./errors.ts";
 import {
   TessieVehicleSummary,
@@ -128,6 +130,18 @@ export class TessieClient {
           "Content-Type": "application/json",
         },
         timeout: DEFAULT_TIMEOUT_MS,
+        httpAgent: new HttpAgent({
+          keepAlive: true,
+          keepAliveMsecs: 30000,
+          maxSockets: 50,
+          maxFreeSockets: 10,
+        }),
+        httpsAgent: new HttpsAgent({
+          keepAlive: true,
+          keepAliveMsecs: 30000,
+          maxSockets: 50,
+          maxFreeSockets: 10,
+        }),
       });
   }
 

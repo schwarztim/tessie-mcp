@@ -51,7 +51,7 @@ describe("tool handlers with mocked client", () => {
   };
 
   const server = createServer({
-    config: { TESSIE_API_KEY: "test" },
+    config: { accessToken: "test" },
     client: mockClient as any,
   });
   const invoke = makeInvoke(server);
