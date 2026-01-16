@@ -31,35 +31,96 @@ export function getTool(server: McpServer, name: string) {
 const VIN_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
 const operations = [
+  // Basic Vehicle Control
   "lock",
   "unlock",
-  "start_charging",
-  "stop_charging",
-  "set_charge_limit",
-  "set_charging_amps",
-  "set_temperature",
-  "start_climate",
-  "stop_climate",
+  "wake",
   "flash_lights",
   "honk",
-  "wake",
+
+  // Trunk & Access
+  "activate_front_trunk",
+  "activate_rear_trunk",
+  "open_tonneau",
+  "close_tonneau",
+
+  // Windows & Sunroof
+  "vent_windows",
+  "close_windows",
+  "vent_sunroof",
+  "close_sunroof",
+
+  // Climate Control
+  "start_climate",
+  "stop_climate",
+  "set_temperature",
+  "set_seat_heating",
+  "set_seat_cooling",
   "start_defrost",
   "stop_defrost",
   "start_steering_wheel_heater",
   "stop_steering_wheel_heater",
   "set_cabin_overheat_protection",
   "set_cabin_overheat_protection_temp",
+  "set_bioweapon_mode",
+  "set_climate_keeper_mode",
+
+  // Charging
+  "start_charging",
+  "stop_charging",
+  "set_charge_limit",
+  "set_charging_amps",
+  "open_charge_port",
+  "close_charge_port",
+  "set_scheduled_charging",
+  "add_charge_schedule",
+  "remove_charge_schedule",
+
+  // Convenience & Features
+  "trigger_homelink",
+  "remote_start",
+  "remote_boombox",
+  "share",
+
+  // Security & Modes
   "enable_sentry_mode",
   "disable_sentry_mode",
+  "enable_valet_mode",
+  "disable_valet_mode",
+  "enable_guest_mode",
+  "disable_guest_mode",
+
+  // Speed Limiting
+  "set_speed_limit",
   "enable_speed_limit",
   "disable_speed_limit",
   "clear_speed_limit_pin",
-  "set_seat_heating",
-  "set_seat_cooling",
-  "set_speed_limit",
+
+  // Software Updates
+  "schedule_software_update",
+  "cancel_software_update",
+
+  // Scheduling & Departure
+  "set_scheduled_departure",
+  "add_precondition_schedule",
+  "remove_precondition_schedule",
 ] as const;
 
-const SAFE_OPERATIONS: Operation[] = ["flash_lights", "honk", "wake"];
+const SAFE_OPERATIONS: Operation[] = [
+  "flash_lights",
+  "honk",
+  "wake",
+  "activate_front_trunk",
+  "activate_rear_trunk",
+  "open_tonneau",
+  "close_tonneau",
+  "vent_windows",
+  "close_windows",
+  "vent_sunroof",
+  "close_sunroof",
+  "trigger_homelink",
+  "remote_boombox",
+];
 const LIST_LIMIT = 12;
 const PATH_POINT_LIMIT = 200;
 
@@ -186,6 +247,118 @@ const commandMap: Record<
   },
   enable_sentry_mode: { endpoint: "enable_sentry" },
   disable_sentry_mode: { endpoint: "disable_sentry" },
+
+  // Trunk & Access
+  activate_front_trunk: { endpoint: "activate_front_trunk" },
+  activate_rear_trunk: { endpoint: "activate_rear_trunk" },
+  open_tonneau: { endpoint: "open_tonneau" },
+  close_tonneau: { endpoint: "close_tonneau" },
+
+  // Windows & Sunroof
+  vent_windows: { endpoint: "vent_windows" },
+  close_windows: { endpoint: "close_windows" },
+  vent_sunroof: { endpoint: "vent_sunroof" },
+  close_sunroof: { endpoint: "close_sunroof" },
+
+  // Charging (additional)
+  open_charge_port: { endpoint: "open_charge_port" },
+  close_charge_port: { endpoint: "close_charge_port" },
+  set_scheduled_charging: {
+    endpoint: "set_scheduled_charging",
+    buildPayload: (p) => ({
+      enable: p?.cabin_overheat_on,
+      time: p?.speed_limit_pin, // Reusing fields for flexibility
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  add_charge_schedule: {
+    endpoint: "add_charge_schedule",
+    buildPayload: (p) => ({
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  remove_charge_schedule: {
+    endpoint: "remove_charge_schedule",
+    buildPayload: (p) => ({
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+
+  // Climate (additional)
+  set_bioweapon_mode: {
+    endpoint: "set_bioweapon_mode",
+    buildPayload: (p) => ({
+      on: p?.cabin_overheat_on,
+      manual_override: false,
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  set_climate_keeper_mode: {
+    endpoint: "set_climate_keeper_mode",
+    buildPayload: (p) => ({
+      mode: p?.seat_level ?? 0, // 0=off, 1=keep, 2=dog, 3=camp
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+
+  // Convenience & Features
+  trigger_homelink: { endpoint: "trigger_homelink" },
+  remote_start: { endpoint: "remote_start" },
+  remote_boombox: { endpoint: "remote_boombox" },
+  share: {
+    endpoint: "share",
+    buildPayload: (p) => ({
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+
+  // Security & Modes
+  enable_valet_mode: {
+    endpoint: "enable_valet",
+    buildPayload: (p) => ({
+      pin: p?.speed_limit_pin,
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  disable_valet_mode: {
+    endpoint: "disable_valet",
+    buildPayload: (p) => ({
+      pin: p?.speed_limit_pin,
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  enable_guest_mode: { endpoint: "enable_guest" },
+  disable_guest_mode: { endpoint: "disable_guest" },
+
+  // Software Updates
+  schedule_software_update: {
+    endpoint: "schedule_software_update",
+    buildPayload: (p) => ({
+      offset: p?.charging_amps ?? 0,
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  cancel_software_update: { endpoint: "cancel_software_update" },
+
+  // Scheduling & Departure
+  set_scheduled_departure: {
+    endpoint: "set_scheduled_departure",
+    buildPayload: (p) => ({
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  add_precondition_schedule: {
+    endpoint: "add_precondition_schedule",
+    buildPayload: (p) => ({
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
+  remove_precondition_schedule: {
+    endpoint: "remove_precondition_schedule",
+    buildPayload: (p) => ({
+      wait_for_completion: p?.wait_for_completion ?? true,
+    }),
+  },
 };
 
 function ensurePositive(value: number | undefined, name: string) {

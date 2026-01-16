@@ -2,6 +2,36 @@
 
 All notable changes to the Tessie MCP Extension will be documented in this file.
 
+## [v2.1.0] - 2026-01-16
+
+### Added - Complete Tessie API Coverage
+- **Trunk & Access Operations**: Open/close front trunk (frunk), rear trunk, and Cybertruck tonneau
+- **Windows & Sunroof**: Vent/close windows and sunroof controls
+- **Enhanced Charging**: Charge port control, scheduled charging, charge schedule management
+- **Advanced Climate**: Bioweapon Defense Mode, Climate Keeper modes (Keep, Dog, Camp)
+- **Convenience Features**: HomeLink trigger, remote start, Boombox controls, location sharing
+- **Security Modes**: Valet mode (with PIN), Guest mode controls
+- **Software Updates**: Schedule and cancel OTA updates
+- **Departure Planning**: Scheduled departure and preconditioning schedules
+
+### Operations Summary
+- **Previous**: 24 operations
+- **Current**: 58 operations (141% increase)
+- **New Safe Operations**: Trunk, windows, sunroof, HomeLink, and boombox (no confirmation required)
+
+### Technical Details
+- All new operations follow existing confirmation pattern for destructive actions
+- Safe operations (view-only or easily reversible) don't require `confirm: true`
+- Maintained backward compatibility with all existing tools and parameters
+- Enhanced `manage_vehicle_command` tool now supports full Tessie Fleet API
+
+### Impact
+- **Trunk Control**: Users can now open trunks directly ("open T3's trunk")
+- **Complete Climate Control**: Full HVAC control including bioweapon and keeper modes
+- **Convenience**: HomeLink, remote start, and scheduled features now accessible
+- **Security**: Valet and guest mode management through Claude
+- **No Breaking Changes**: All existing functionality preserved
+
 ## [v2.0.1] - 2026-01-16
 
 ### Fixed
